@@ -5,8 +5,6 @@ import { unlink } from "fs";
 import { env } from "./env";
 
 const uploadToGCS = async ({ name, path }: { name: string; path: string }) => {
-  console.log("Uploading backup to GCS...");
-
   const bucketName = env.GCS_BUCKET;
 
   const uploadOptions: UploadOptions = {
@@ -19,13 +17,9 @@ const uploadToGCS = async ({ name, path }: { name: string; path: string }) => {
   });
 
   await storage.bucket(bucketName).upload(path, uploadOptions);
-
-  console.log("Backup uploaded to GCS...");
 };
 
 const dumpToFile = async (path: string) => {
-  console.log("Dumping DB to file...");
-
   await new Promise((resolve, reject) => {
     exec(
       `pg_dump ${env.BACKUP_DATABASE_URL} -F t | gzip > ${path}`,
@@ -39,12 +33,9 @@ const dumpToFile = async (path: string) => {
       }
     );
   });
-
-  console.log("DB dumped to file...");
 };
 
 const deleteFile = async (path: string) => {
-  console.log("Deleting file...");
   await new Promise((resolve, reject) => {
     unlink(path, (err) => {
       reject({ error: JSON.stringify(err) });
@@ -55,8 +46,6 @@ const deleteFile = async (path: string) => {
 };
 
 export const backup = async () => {
-  console.log("Initiating DB backup...");
-
   let date = new Date().toISOString();
   const timestamp = date.replace(/[:.]+/g, "-");
   const filename = `${env.BACKUP_PREFIX}backup-${timestamp}.tar.gz`;
@@ -66,5 +55,5 @@ export const backup = async () => {
   await uploadToGCS({ name: filename, path: filepath });
   await deleteFile(filepath);
 
-  console.log("DB backup complete...");
+  console.log("Postgres backup to GCS completed");
 };
