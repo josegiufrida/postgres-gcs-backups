@@ -30,10 +30,10 @@ const dumpToFile = async (path: string) => {
         return;
       }
 
-      if (stderr != "") {
-        reject({ stderr: stderr.trimEnd() });
-        return;
-      }
+      // if (stderr != "") {
+      //  reject({ stderr: stderr.trimEnd() });
+      //  return;
+      //}
 
       resolve(undefined);
     });
